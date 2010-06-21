@@ -36,6 +36,7 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
@@ -113,11 +114,16 @@ public class UDPEndPoint {
 	 * @throws UnknownHostException
 	 */
 	public UDPEndPoint(InetAddress localAddress, int localPort)throws SocketException, UnknownHostException{
+	    dgSocket = new DatagramSocket();
+	    dgSocket.setReuseAddress(true);
+	    dgSocket.bind(new InetSocketAddress(localAddress, localPort));
+	    /*
 		if(localAddress==null){
 			dgSocket=new DatagramSocket(localPort, localAddress);
 		}else{
 			dgSocket=new DatagramSocket(localPort);
 		}
+		*/
 		if(localPort>0)this.port = localPort;
 		else port=dgSocket.getLocalPort();
 		
