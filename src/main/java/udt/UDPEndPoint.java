@@ -117,11 +117,17 @@ public class UDPEndPoint {
 	    //dgSocket = new DatagramSocket();
 	    //dgSocket.setReuseAddress(true);
 	    //dgSocket.bind(new InetSocketAddress(localAddress, localPort));
+	    /*
 		if(localAddress==null){
 			dgSocket=new DatagramSocket(localPort, localAddress);
 		}else{
 			dgSocket=new DatagramSocket(localPort);
 		}
+		*/
+	    dgSocket = new DatagramSocket(null);
+	    dgSocket.setReuseAddress(true);
+	    dgSocket.bind(new InetSocketAddress(localAddress, localPort));
+	    
 		if(localPort>0)this.port = localPort;
 		else port=dgSocket.getLocalPort();
 		
