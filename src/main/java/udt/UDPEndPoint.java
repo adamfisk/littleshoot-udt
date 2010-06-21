@@ -114,16 +114,14 @@ public class UDPEndPoint {
 	 * @throws UnknownHostException
 	 */
 	public UDPEndPoint(InetAddress localAddress, int localPort)throws SocketException, UnknownHostException{
-	    dgSocket = new DatagramSocket();
-	    dgSocket.setReuseAddress(true);
-	    dgSocket.bind(new InetSocketAddress(localAddress, localPort));
-	    /*
-		if(localAddress==null){
+	    //dgSocket = new DatagramSocket();
+	    //dgSocket.setReuseAddress(true);
+	    //dgSocket.bind(new InetSocketAddress(localAddress, localPort));
+		if(localAddress!=null){
 			dgSocket=new DatagramSocket(localPort, localAddress);
 		}else{
 			dgSocket=new DatagramSocket(localPort);
 		}
-		*/
 		if(localPort>0)this.port = localPort;
 		else port=dgSocket.getLocalPort();
 		
