@@ -101,6 +101,7 @@ public class UDTSocket extends Socket {
 	}
 
 	public void setActive(boolean active) {
+	    logger.info("Setting active to "+active);
 		this.active = active;
 	}
 
@@ -121,6 +122,7 @@ public class UDTSocket extends Socket {
 	 * @param data
 	 */
 	protected void doWrite(byte[]data)throws IOException{
+	    logger.info("Called...");
 		doWrite(data, 0, data.length);
 		
 	}
@@ -133,6 +135,7 @@ public class UDTSocket extends Socket {
 	 * @throws IOException
 	 */
 	protected void doWrite(byte[]data, int offset, int length)throws IOException{
+	    logger.info("Called...");
 		try{
 			doWrite(data, offset, length, Integer.MAX_VALUE, TimeUnit.MILLISECONDS);
 		}catch(InterruptedException ie){
@@ -153,7 +156,7 @@ public class UDTSocket extends Socket {
 	 * @throws InterruptedException
 	 */
 	protected void doWrite(byte[]data, int offset, int length, int timeout, TimeUnit units)throws IOException,InterruptedException{
-	    logger.info("Got call to write data!!!");
+	    logger.info("Got call to write data!!!: "+new String(data));
 		int chunksize=session.getDatagramSize()-24;//need some bytes for the header
 		ByteBuffer bb=ByteBuffer.wrap(data,offset,length);
 		long seqNo=0;
@@ -169,6 +172,7 @@ public class UDTSocket extends Socket {
 			packet.setData(chunk);
 			//put the packet into the send queue
 			if(!sender.sendUdtPacket(packet, timeout, units)){
+			    logger.warning("Queue full!!");
 				throw new IOException("Queue full");
 			}
 		}
@@ -179,23 +183,33 @@ public class UDTSocket extends Socket {
 	 * and acknowledged
 	 */
 	protected void flush() throws InterruptedException{
-		if(!active)return;
+	    logger.info("Flushing...");
+		if(!active)
+		    {
+		    logger.info("Not active...returning from flush call");
+		    return;
+		    }
 		final long seqNo=sender.getCurrentSequenceNumber();
 		if(seqNo<0)throw new IllegalStateException();
+		logger.info("Flushing...checking for sent out...");
 		while(!sender.isSentOut(seqNo)){
 			Thread.sleep(5);
 		}
 		if(seqNo>-1){
+		    logger.info("Flushing...waiting for ack...");
 			//wait until data has been sent out and acknowledged
 			while(active && !sender.haveAcknowledgementFor(seqNo)){
 				sender.waitForAck(seqNo);
 			}
 		}
+		logger.info("Flushing...pausing");
 		sender.pause();
+		logger.info("Flushing...returning");
 	}
 	
 	//writes and wait for ack
 	protected void doWriteBlocking(byte[]data)throws IOException, InterruptedException{
+	    logger.info("Called...");
 		doWrite(data);
 		flush();
 	}

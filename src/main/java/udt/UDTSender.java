@@ -222,6 +222,7 @@ public class UDTSender {
 	 */
 	protected boolean sendUdtPacket(DataPacket p, int timeout, TimeUnit units)throws IOException,InterruptedException{
 		if(!started)start();
+		logger.info("Sending packet!!");
 		return sendQueue.offer(p,timeout,units);
 	}
 
