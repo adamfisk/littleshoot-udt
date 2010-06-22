@@ -75,6 +75,7 @@ public class ClientSession extends UDTSession {
 			n++;
 			if(getState()!=ready)Thread.sleep(500);
 		}
+		logger.info("Initing...");
 		cc.init();
 		logger.info("Connected, "+n+" handshake packets sent");		
 	}
@@ -133,6 +134,7 @@ public class ClientSession extends UDTSession {
 		handshake.setSession(this);
 		logger.info("Handshake to "+this.getDestination());
 		endPoint.doSend(handshake);
+		logger.info("Sent handshake");
 	}
 	
 	
