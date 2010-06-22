@@ -41,9 +41,7 @@ import java.net.SocketException;
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
 import java.util.concurrent.TimeUnit;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.util.logging.Logger;
 
 import udt.packets.DataPacket;
 
@@ -57,7 +55,8 @@ import udt.packets.DataPacket;
  */
 public class UDTSocket extends Socket {
 	
-    private final Logger log = LoggerFactory.getLogger(getClass());
+    private final Logger logger=Logger.getLogger(getClass().getName());
+    
 	//endpoint
 	private final UDPEndPoint endpoint;
 	
@@ -154,7 +153,7 @@ public class UDTSocket extends Socket {
 	 * @throws InterruptedException
 	 */
 	protected void doWrite(byte[]data, int offset, int length, int timeout, TimeUnit units)throws IOException,InterruptedException{
-	    log.info("Got call to write data!!!");
+	    logger.info("Got call to write data!!!");
 		int chunksize=session.getDatagramSize()-24;//need some bytes for the header
 		ByteBuffer bb=ByteBuffer.wrap(data,offset,length);
 		long seqNo=0;
@@ -206,11 +205,13 @@ public class UDTSocket extends Socket {
     public void bind (final SocketAddress address) throws IOException {
         // For now, we do not allow binding of the local address. The ephemeral
         // port will just be chosen.
+        logger.warning("Not supported!!!");
         throw new UnsupportedOperationException ();
     }
 
     @Override
     public synchronized void close () throws IOException {
+        logger.info("Called");
         if(inputStream!=null)inputStream.close();
         if(outputStream!=null)outputStream.close();
         active=false;
@@ -218,27 +219,31 @@ public class UDTSocket extends Socket {
 
     @Override
     public void connect (final SocketAddress address) throws IOException {
+        logger.info("Called");
         connect (address, 60000);
     }
 
     @Override
     public void connect (final SocketAddress address, final int timeout) 
         throws IOException {
+        logger.info("Called");
     }
 
     @Override
     public SocketChannel getChannel () {
+        logger.warning("Not supported!!!");
         throw new UnsupportedOperationException ();
     }
 
     @Override
     public InetAddress getInetAddress () {
+        logger.info("Called");
         return this.endpoint.getSocket().getInetAddress();
     }
 
     @Override
     public InputStream getInputStream () throws IOException {
-        log.info("Getting input stream");
+        logger.info("Getting input stream");
         if (isClosed())
             throw new SocketException("Socket is closed");
         if (!isConnected())
@@ -254,32 +259,37 @@ public class UDTSocket extends Socket {
     
     @Override
     public boolean getKeepAlive () throws SocketException {
+        logger.info("Called");
         return false;
     }
 
     @Override
     public InetAddress getLocalAddress () {
+        logger.info("Called");
         return this.endpoint.getLocalAddress();
     }
 
     @Override
     public int getLocalPort () {
+        logger.info("Called");
         return this.endpoint.getLocalPort();
     }
 
     @Override
     public SocketAddress getLocalSocketAddress () {
+        logger.info("Called");
         return this.endpoint.getSocket().getLocalSocketAddress();
     }
 
     @Override
     public boolean getOOBInline () throws SocketException {
+        logger.info("Called");
         return false;
     }
     
     @Override
     public OutputStream getOutputStream () throws IOException {
-        log.info("Getting output stream");
+        logger.info("Getting output stream");
         if (isClosed())
             throw new SocketException("Socket is closed");
         if (!isConnected())
@@ -295,28 +305,33 @@ public class UDTSocket extends Socket {
 
     @Override
     public int getPort () {
+        logger.info("Getting port");
         return this.endpoint.getSocket().getPort();
     }
 
     @Override
     public synchronized int getReceiveBufferSize () throws SocketException {
         //throw new UnsupportedOperationException ();
+        logger.info("Called");
         // This is just the default size we've seen on OSX.
         return 81660;
     }
 
     @Override
     public SocketAddress getRemoteSocketAddress () {
+        logger.info("Called");
         return this.endpoint.getSocket().getRemoteSocketAddress();
     }
 
     @Override
     public boolean getReuseAddress () throws SocketException {
+        logger.warning("Not supported!!!");
         throw new UnsupportedOperationException ();
     }
 
     @Override
     public synchronized int getSendBufferSize () throws SocketException {
+        logger.info("Called");
         //throw new UnsupportedOperationException ();
         // This is just the default size we've seen on OSX.
         return 81660; 
@@ -324,97 +339,115 @@ public class UDTSocket extends Socket {
 
     @Override
     public int getSoLinger () throws SocketException {
+        logger.warning("Not supported!!!");
         throw new UnsupportedOperationException ();
     }
 
     @Override
     public synchronized int getSoTimeout () throws SocketException {
+        logger.warning("Not supported!!!");
         throw new UnsupportedOperationException ();
     }
 
     @Override
     public boolean getTcpNoDelay () throws SocketException {
+        logger.warning("Not supported!!!");
         throw new UnsupportedOperationException ();
     }
 
     @Override
     public int getTrafficClass () throws SocketException {
+        logger.warning("Not supported!!!");
         throw new UnsupportedOperationException ();
     }
 
     @Override
     public boolean isBound () {
+        logger.info("Called");
         return this.endpoint.getSocket().isBound();
     }
 
     @Override
     public boolean isClosed () {
+        logger.info("Called");
         return !active;
     }
 
     @Override
     public boolean isConnected () {
+        logger.info("Called");
         final int state = this.session.getState();
         return state == 2 || state == 3;
     }
 
     @Override
     public boolean isInputShutdown () {
+        logger.info("Called");
         return isClosed();
     }
 
     @Override
     public boolean isOutputShutdown () {
+        logger.info("Called");
         return isClosed();
     }
 
     @Override
     public void sendUrgentData (final int data) throws IOException {
+        logger.warning("Not supported!!!");
         throw new UnsupportedOperationException ();
     }
 
     @Override
     public void setKeepAlive (final boolean on) throws SocketException {
+        logger.warning("Not supported!!!");
         throw new UnsupportedOperationException ();
     }
 
     @Override
     public void setOOBInline (final boolean on) throws SocketException {
+        logger.warning("Not supported!!!");
         throw new UnsupportedOperationException ();
     }
 
     @Override
     public void setPerformancePreferences (final int connectionTime,
         final int latency, final int bandwidth) {
+        logger.warning("Not supported!!!");
         throw new UnsupportedOperationException ();
     }
 
     @Override
     public synchronized void setReceiveBufferSize (final int size) 
         throws SocketException {
+        logger.warning("Not supported!!!");
         throw new UnsupportedOperationException ();
     }
 
     @Override
     public void setReuseAddress (final boolean on) throws SocketException {
+        logger.warning("Not supported!!!");
         throw new UnsupportedOperationException ();
     }
 
     @Override
     public synchronized void setSendBufferSize (final int size) 
         throws SocketException {
+        logger.warning("Not supported!!!");
         throw new UnsupportedOperationException ();
     }
 
     @Override
     public void setSoLinger (final boolean on, final int linger) 
         throws SocketException {
+        logger.warning("Not supported!!!");
         throw new UnsupportedOperationException ();
     }
 
     @Override
     public synchronized void setSoTimeout (final int timeout) 
         throws SocketException {
+        logger.info("Called");
         if (isClosed())
             throw new SocketException("Socket is closed");
         if (timeout < 0)
@@ -425,21 +458,25 @@ public class UDTSocket extends Socket {
 
     @Override
     public void setTcpNoDelay (final boolean on) throws SocketException {
+        logger.info("Called");
         // We have not way of implementing this over RUDP for now.
         //throw new UnsupportedOperationException ();
     }
 
     @Override
     public void setTrafficClass (final int tc) throws SocketException {
+        logger.warning("Not supported!!!");
         throw new UnsupportedOperationException ();
     }
 
     @Override
     public void shutdownInput () throws IOException {
+        logger.info("Called");
     }
 
     @Override
     public void shutdownOutput () throws IOException {
+        logger.info("Called");
     }
 
 }
