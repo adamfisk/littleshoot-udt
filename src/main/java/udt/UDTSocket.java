@@ -211,7 +211,7 @@ public class UDTSocket extends Socket {
 
     @Override
     public synchronized void close () throws IOException {
-        logger.info("Called");
+        logger.info("Called...");
         if(inputStream!=null)inputStream.close();
         if(outputStream!=null)outputStream.close();
         active=false;
@@ -369,8 +369,9 @@ public class UDTSocket extends Socket {
 
     @Override
     public boolean isClosed () {
-        logger.info("Called");
-        return !active;
+        logger.info("Called -- returning--"+!active);
+        //return !active;
+        return false;
     }
 
     @Override
