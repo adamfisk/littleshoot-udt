@@ -42,6 +42,9 @@ import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
 import java.util.concurrent.TimeUnit;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import udt.packets.DataPacket;
 
 /**
@@ -54,6 +57,7 @@ import udt.packets.DataPacket;
  */
 public class UDTSocket extends Socket {
 	
+    private final Logger log = LoggerFactory.getLogger(getClass());
 	//endpoint
 	private final UDPEndPoint endpoint;
 	
@@ -150,6 +154,7 @@ public class UDTSocket extends Socket {
 	 * @throws InterruptedException
 	 */
 	protected void doWrite(byte[]data, int offset, int length, int timeout, TimeUnit units)throws IOException,InterruptedException{
+	    log.info("Got call to write data!!!");
 		int chunksize=session.getDatagramSize()-24;//need some bytes for the header
 		ByteBuffer bb=ByteBuffer.wrap(data,offset,length);
 		long seqNo=0;
@@ -233,6 +238,7 @@ public class UDTSocket extends Socket {
 
     @Override
     public InputStream getInputStream () throws IOException {
+        log.info("Getting input stream");
         if (isClosed())
             throw new SocketException("Socket is closed");
         if (!isConnected())
@@ -273,6 +279,7 @@ public class UDTSocket extends Socket {
     
     @Override
     public OutputStream getOutputStream () throws IOException {
+        log.info("Getting output stream");
         if (isClosed())
             throw new SocketException("Socket is closed");
         if (!isConnected())
