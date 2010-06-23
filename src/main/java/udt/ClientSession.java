@@ -73,7 +73,11 @@ public class ClientSession extends UDTSession {
 		while(getState()!=ready){
 			if(getState()==invalid)throw new IOException("Can't connect!");
 			n++;
-			if(getState()!=ready)Thread.sleep(500);
+			if(getState()!=ready)
+			    {
+			    logger.info("Sleeping");
+			    Thread.sleep(500);
+			    }
 		}
 		logger.info("Initing...");
 		cc.init();

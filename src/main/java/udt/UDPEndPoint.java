@@ -324,6 +324,7 @@ public class UDPEndPoint {
 		DatagramPacket dgp = packet.getSession().getDatagram();
 		dgp.setData(data);
 		dgSocket.send(dgp);
+		logger.info("Finished send");
 	}
 
 	public String toString(){

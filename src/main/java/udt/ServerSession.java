@@ -160,6 +160,7 @@ public class ServerSession extends UDTSession {
 		responseHandshake.setDestinationID(this.getDestination().getSocketID());
 		responseHandshake.setSession(this);
 		endPoint.doSend(responseHandshake);
+		logger.info("Sent handshake");
 	}
 
 
