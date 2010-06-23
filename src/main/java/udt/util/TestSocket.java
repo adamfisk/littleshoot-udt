@@ -41,8 +41,10 @@ import java.net.Socket;
 import java.nio.ByteBuffer;
 import java.text.NumberFormat;
 
+import org.lastbamboo.common.util.IoUtils;
+import org.lastbamboo.common.util.WriteListener;
+
 import udt.UDTClient;
-import udt.UDTOutputStream;
 import udt.UDTReceiver;
 
 /**
@@ -67,10 +69,87 @@ public class TestSocket extends Application{
 		this.remoteFile=remoteFile;
 		this.localFile=localFile;
 		format=NumberFormat.getNumberInstance();
+	
 		format.setMaximumFractionDigits(3);
 	}
 	
-	public void run(){
+    public void run(){
+        configure();
+        try{
+            UDTReceiver.connectionExpiryDisabled=true;
+            InetAddress myHost=localIP!=null?InetAddress.getByName(localIP):InetAddress.getLocalHost();
+            UDTClient client=localPort!=-1?new UDTClient(myHost,localPort):new UDTClient(myHost);
+            client.connect(serverHost, serverPort);
+            
+            Socket sock = client.getSocket();
+            InputStream in = sock.getInputStream();
+            OutputStream out = sock.getOutputStream();
+            
+            byte[]readBuf=new byte[1024];
+            ByteBuffer bb=ByteBuffer.wrap(readBuf);
+            System.out.println("[ReceiveFile] Requesting file "+remoteFile);
+            //send name file info
+            byte[]fName=remoteFile.getBytes();
+            bb.putInt(fName.length+1);
+            
+            bb.put(fName);
+            bb.put((byte)0);
+            
+            out.write(readBuf, 0, bb.position());
+            out.flush();
+            
+            //pause the sender to save some CPU time
+            //out.pauseOutput();
+            
+            //read size info (an 4-byte int) 
+            byte[]sizeInfo=new byte[4];
+            
+            while(in.read(sizeInfo)==0);
+            
+            long size=ByteBuffer.wrap(sizeInfo).getInt();
+            
+            System.out.println("FILE SIZE: "+size);
+            final FileOutputStream fos=new FileOutputStream(remoteFile+".downloaded");
+            
+            System.out.println("[ReceiveFile] Reading <"+size+"> bytes.");
+            //long start = System.currentTimeMillis();
+            
+            //and read the file data
+            //Util.copy(in, fos, size, false);
+            IoUtils.copy(in, fos, size);
+            //long end = System.currentTimeMillis();
+            //double rate=1000.0*size/1024/1024/(end-start);
+            //System.out.println("[ReceiveFile] Rate: "+format.format(rate)+" MBytes/sec. "
+            //        +format.format(8*rate)+" MBit/sec.");
+        
+            client.shutdown();
+            
+            if(verbose)System.out.println(client.getStatistics());
+            
+            
+            /*
+            in.close();
+            out.close();
+            sock.close();
+            fos.close();
+            */
+            /*
+            IoUtils.copy(in, fos, new WriteListener() {
+                private int totalBytes = 0;
+                public void onBytesRead(final int numBytes) {
+                    System.out.println("Wrote "+numBytes+" bytes...");
+                    totalBytes += numBytes;
+                    if (totalBytes ==)
+                }
+            });
+            */
+        }
+        catch (final Exception e) {
+            
+        }
+    }
+	
+	public void run2(){
 		configure();
 		try{
 			UDTReceiver.connectionExpiryDisabled=true;

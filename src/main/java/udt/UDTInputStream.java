@@ -111,6 +111,85 @@ public class UDTInputStream extends InputStream {
 	//offset into currentChunk
 	int offset=0;
 
+	/*
+    public int read(byte b[], int off, int len) throws IOException {
+        if (b == null) {
+            throw new NullPointerException();
+        } else if (off < 0 || len < 0 || len > b.length - off) {
+            throw new IndexOutOfBoundsException();
+        } else if (len == 0) {
+            return 0;
+        }
+
+        int c = read();
+        if (c == -1) {
+            return -1;
+        }
+        b[off] = (byte)c;
+
+        int i = 1;
+        try {
+            for (; i < len ; i++) {
+            c = read();
+            if (c == -1) {
+                break;
+            }
+            b[off + i] = (byte)c;
+            }
+        } catch (IOException ee) {
+        }
+        return i;
+        }
+        */
+    
+    @Override
+    public int read(final byte[] target, final int off, final int len) throws IOException{
+        if (target == null) {
+            throw new NullPointerException();
+        } else if (off < 0 || len < 0 || len > target.length - off) {
+            throw new IndexOutOfBoundsException();
+        } else if (len == 0) {
+            return 0;
+        }
+        try{
+            int read=0;
+            updateCurrentChunk(false);
+            while(currentChunk!=null){
+                byte[]data=currentChunk.data;
+                int targetMax = target.length - read - off;
+                int sourceMax = data.length - offset;
+                int length = Math.min(targetMax, sourceMax);
+                length = Math.min(length, len);
+                System.arraycopy(data, offset, target, read+off, length);
+                read+=length;
+                offset+=length;
+                //check if chunk has been fully read
+                if(offset>=data.length){
+                    currentChunk=null;
+                    offset=0;
+                }
+
+                //if no more space left in target, exit now
+                if(read == target.length || read == len){
+                    return read;
+                }
+
+                updateCurrentChunk(blocking && read==0);
+            }
+
+            if(read>0)return read;
+            if(closed)return -1;
+            if(expectMoreData.get() || !appData.isEmpty())return 0;
+            //no more data
+            return -1;
+
+        }catch(Exception ex){
+            IOException e= new IOException();
+            e.initCause(ex);
+            throw e;
+        }
+    }
+    
 	@Override
 	public int read(byte[]target)throws IOException{
 		try{

@@ -132,7 +132,60 @@ public class TestServerSocket extends Application{
 			memMapped=true;
 		}
 		
-		public void run(){
+        
+        public void run(){
+            try{
+                logger.info("Handling request from "+socket.getRemoteSocketAddress());
+                InputStream in=socket.getInputStream();
+                OutputStream out=socket.getOutputStream();
+                byte[]readBuf=new byte[32768];
+                ByteBuffer bb=ByteBuffer.wrap(readBuf);
+
+                //read file name info 
+                while(in.read(readBuf)==0)Thread.sleep(100);
+
+                //how many bytes to read for the file name
+                int length=bb.getInt();
+                byte[]fileName=new byte[length-1];
+                bb.get(fileName);
+
+                File file=new File("boost.zip");
+                System.out.println("[SendFile] File requested: '"+file.getPath()+"'");
+
+                FileInputStream fis=null;
+                try{
+                    long size=file.length();
+                    System.out.println("[SendFile] File size: "+size);
+                    //send size info
+                    out.write(PacketUtil.encode(size));
+                    long start=System.currentTimeMillis();
+                    //and send the file
+                    if(memMapped){
+                        copyFile(file,out);
+                    }else{
+                        fis=new FileInputStream(file);
+                        Util.copy(fis, out, size, false);
+                    }
+                    long end=System.currentTimeMillis();
+                    System.out.println(((UDTSocket)socket).getSession().getStatistics().toString());
+                    double rate=1000.0*size/1024/1024/(end-start);
+                    System.out.println("[SendFile] Rate: "+format.format(rate)+" MBytes/sec. "+format.format(8*rate)+" MBit/sec.");
+                    if(Boolean.getBoolean("udt.sender.storeStatistics")){
+                        ((UDTSocket)socket).getSession().getStatistics().writeParameterHistory(new File("udtstats-"+System.currentTimeMillis()+".csv"));
+                    }
+                }finally{
+                    socket.close();
+                    //socket.getSender().stop();
+                    if(fis!=null)fis.close();
+                }
+                logger.info("Finished request from "+((UDTSocket)socket).getSession().getDestination());
+            }catch(Exception ex){
+                ex.printStackTrace();
+                throw new RuntimeException(ex);
+            }
+        }
+        
+		public void run2(){
 			try{
 				logger.info("Handling request from "+socket.getRemoteSocketAddress());
 				InputStream in=socket.getInputStream();
