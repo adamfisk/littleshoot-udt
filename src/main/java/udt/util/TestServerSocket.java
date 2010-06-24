@@ -82,6 +82,7 @@ public class TestServerSocket extends Application{
 		try{
 			UDTReceiver.connectionExpiryDisabled=true;
 			InetAddress myHost=localIP!=null?InetAddress.getByName(localIP):InetAddress.getLocalHost();
+			
 			UDTServerSocket server=new UDTServerSocket(myHost,serverPort);
 			while(true){
 				Socket socket=server.accept();
@@ -126,7 +127,8 @@ public class TestServerSocket extends Application{
 		private final NumberFormat format=NumberFormat.getNumberInstance();
 		
 		private final boolean memMapped;
-		public RequestRunner(Socket sock){
+		
+		public RequestRunner(final Socket sock){
 			this.socket= sock;
 			format.setMaximumFractionDigits(3);
 			memMapped=true;
@@ -149,7 +151,8 @@ public class TestServerSocket extends Application{
                 byte[]fileName=new byte[length-1];
                 bb.get(fileName);
 
-                File file=new File("boost.zip");
+                //File file=new File("boost.zip");
+                File file = new File(new String(fileName));
                 System.out.println("[SendFile] File requested: '"+file.getPath()+"'");
 
                 FileInputStream fis=null;

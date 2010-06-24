@@ -38,6 +38,9 @@ import java.util.concurrent.PriorityBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import udt.util.UDTStatistics;
 
 /**
@@ -49,6 +52,8 @@ import udt.util.UDTStatistics;
  */
 public class UDTInputStream extends InputStream {
 
+    private final Logger log = LoggerFactory.getLogger(getClass());
+    
 	//the socket owning this inputstream
 	private final UDTSocket socket;
 
@@ -94,7 +99,8 @@ public class UDTInputStream extends InputStream {
 	private final byte[]single=new byte[1];
 
 	@Override
-	public int read()throws IOException{
+	public int read()throws IOException {
+	    log.info("Reading single byte");
 		int b=0;
 		while(b==0)
 			b=read(single);
@@ -143,7 +149,9 @@ public class UDTInputStream extends InputStream {
         */
     
     @Override
-    public int read(final byte[] target, final int off, final int len) throws IOException{
+    public int read(final byte[] target, final int off, final int len) 
+        throws IOException {
+        log.info("Reading data with offset '"+off+"' and len '"+len+"'");
         if (target == null) {
             throw new NullPointerException();
         } else if (off < 0 || len < 0 || len > target.length - off) {
@@ -155,9 +163,9 @@ public class UDTInputStream extends InputStream {
             int read=0;
             updateCurrentChunk(false);
             while(currentChunk!=null){
-                byte[]data=currentChunk.data;
-                int targetMax = target.length - read - off;
-                int sourceMax = data.length - offset;
+                final byte[] data = currentChunk.data;
+                final int targetMax = target.length - read - off;
+                final int sourceMax = data.length - offset;
                 int length = Math.min(targetMax, sourceMax);
                 length = Math.min(length, len);
                 System.arraycopy(data, offset, target, read+off, length);
@@ -191,7 +199,8 @@ public class UDTInputStream extends InputStream {
     }
     
 	@Override
-	public int read(byte[]target)throws IOException{
+	public int read(final byte[]target) throws IOException {
+	    log.info("Reading with straight byte array");
 		try{
 			int read=0;
 			updateCurrentChunk(false);
@@ -287,8 +296,9 @@ public class UDTInputStream extends InputStream {
 	}
 
 	@Override
-	public void close()throws IOException{
-		if(closed)return;
+	public void close()throws IOException {
+	    log.info("Closing input stream!!");
+		if(closed) return;
 		closed=true;
 		noMoreData();
 	}

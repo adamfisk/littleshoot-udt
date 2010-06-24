@@ -34,11 +34,16 @@ package udt;
 import java.io.IOException;
 import java.io.OutputStream;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * UDTOutputStream provides a UDT version of {@link OutputStream}
  */
 public class UDTOutputStream extends OutputStream{
 
+    private final Logger log = LoggerFactory.getLogger(getClass());
+    
 	private final UDTSocket socket;
 	
 	private volatile boolean closed;
@@ -48,24 +53,28 @@ public class UDTOutputStream extends OutputStream{
 	}
 	
 	@Override
-	public void write(int args)throws IOException{
+	public void write(int args)throws IOException {
+	    
 		checkClosed();
 		socket.doWrite(new byte[]{(byte)args});
 	}
 
 	@Override
 	public void write(byte[] b, int off, int len) throws IOException {
+	    log.info("Writing data with offset '"+off+"' and len '"+len+"'");
 		checkClosed();
 		socket.doWrite(b, off, len);
 	}
 
 	@Override
 	public void write(byte[] b) throws IOException {
+	    log.info("Writing straight byte array");
 		write(b,0,b.length);
 	}
 	
 	@Override
-	public void flush()throws IOException{
+	public void flush()throws IOException {
+	    log.info("Flushing");
 		try{
 			checkClosed();
 			socket.flush();
@@ -84,7 +93,8 @@ public class UDTOutputStream extends OutputStream{
 	 * of a file transfer, to save some CPU time which would otherwise
 	 * be consumed by the sender thread.
 	 */
-	public void pauseOutput()throws IOException{
+	public void pauseOutput()throws IOException {
+	    log.info("Pausing output");
 		socket.getSender().pause();
 	}
 	
@@ -94,11 +104,16 @@ public class UDTOutputStream extends OutputStream{
 	 */
 	@Override
 	public void close()throws IOException{
+	    log.info("Closing output stream");
 		if(closed)return;
 		closed=true;
 	}
 	
-	private void checkClosed()throws IOException{
-		if(closed)throw new IOException("Stream has been closed");
+	private void checkClosed() throws IOException {
+	    log.info("Checking closed");
+		if (closed) {
+		    log.info("OutputStream is closed!!");
+		    throw new IOException("Stream has been closed");
+		}
 	}
 }
