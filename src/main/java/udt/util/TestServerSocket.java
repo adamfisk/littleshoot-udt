@@ -48,6 +48,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.logging.Logger;
 
+import org.lastbamboo.common.util.IoUtils;
+
 import udt.UDTReceiver;
 import udt.UDTServerSocket;
 import udt.UDTSocket;
@@ -167,7 +169,8 @@ public class TestServerSocket extends Application{
                         copyFile(file,out);
                     }else{
                         fis=new FileInputStream(file);
-                        Util.copy(fis, out, size, false);
+                        IoUtils.copy(fis, out, size);
+                        //Util.copy(fis, out, size, false);
                     }
                     long end=System.currentTimeMillis();
                     System.out.println(((UDTSocket)socket).getSession().getStatistics().toString());
