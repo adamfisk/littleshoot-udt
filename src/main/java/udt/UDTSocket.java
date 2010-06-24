@@ -158,7 +158,7 @@ public class UDTSocket extends Socket {
 	 * @throws InterruptedException
 	 */
 	protected void doWrite(byte[]data, int offset, int length, int timeout, TimeUnit units)throws IOException,InterruptedException{
-	    logger.info("Got call to write data!!!: "+new String(data));
+	    logger.info("Got call to write data!!!: ");//+new String(data));
 		int chunksize=session.getDatagramSize()-24;//need some bytes for the header
 		ByteBuffer bb=ByteBuffer.wrap(data,offset,length);
 		long seqNo=0;
