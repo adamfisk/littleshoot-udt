@@ -202,7 +202,7 @@ public class UDTInputStream extends InputStream {
                 log.info("Waiting for more data");
                 //return 0;
                 // Wait for more data.
-                Thread.sleep(200);
+                Thread.sleep(1000);
                 return read(target, off, len);
             }
             log.info("Reached end -- no more data!!");
