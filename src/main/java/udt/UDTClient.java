@@ -42,13 +42,16 @@ import java.net.UnknownHostException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.slf4j.LoggerFactory;
+
 import udt.packets.Destination;
 import udt.packets.Shutdown;
 import udt.util.UDTStatistics;
 
 public class UDTClient {
 
-	private static final Logger logger=Logger.getLogger(UDTClient.class.getName());
+	//private static final Logger logger=Logger.getLogger(UDTClient.class.getName());
+    private final org.slf4j.Logger logger = LoggerFactory.getLogger(getClass());
 	private final UDPEndPoint clientEndpoint;
 	private ClientSession clientSession;
 
@@ -149,7 +152,8 @@ public class UDTClient {
 			}
 			catch(IOException e)
 			{
-				logger.log(Level.SEVERE,"ERROR: Connection could not be stopped!",e);
+			    logger.error("Exception shutting down", e);
+				//logger.log(Level.SEVERE,"ERROR: Connection could not be stopped!",e);
 			}
 			clientSession.getSocket().getReceiver().stop();
 			clientEndpoint.stop();

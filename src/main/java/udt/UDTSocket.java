@@ -41,7 +41,8 @@ import java.net.SocketException;
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Logger;
+
+import org.slf4j.LoggerFactory;
 
 import udt.packets.DataPacket;
 
@@ -55,7 +56,8 @@ import udt.packets.DataPacket;
  */
 public class UDTSocket extends Socket {
 	
-    private final Logger logger=Logger.getLogger(getClass().getName());
+    //private final Logger logger=Logger.getLogger(getClass().getName());
+    private final org.slf4j.Logger logger = LoggerFactory.getLogger(getClass());
     
 	//endpoint
 	private final UDPEndPoint endpoint;
@@ -172,7 +174,7 @@ public class UDTSocket extends Socket {
 			packet.setData(chunk);
 			//put the packet into the send queue
 			if(!sender.sendUdtPacket(packet, timeout, units)){
-			    logger.warning("Queue full!!");
+			    logger.warn("Queue full!!");
 				throw new IOException("Queue full");
 			}
 		}
@@ -219,7 +221,7 @@ public class UDTSocket extends Socket {
     public void bind (final SocketAddress address) throws IOException {
         // For now, we do not allow binding of the local address. The ephemeral
         // port will just be chosen.
-        logger.warning("Not supported!!!");
+        logger.warn("Not supported!!!");
         throw new UnsupportedOperationException ();
     }
 
@@ -245,7 +247,7 @@ public class UDTSocket extends Socket {
 
     @Override
     public SocketChannel getChannel () {
-        logger.warning("Not supported!!!");
+        logger.warn("Not supported!!!");
         throw new UnsupportedOperationException ();
     }
 
@@ -339,7 +341,7 @@ public class UDTSocket extends Socket {
 
     @Override
     public boolean getReuseAddress () throws SocketException {
-        logger.warning("Not supported!!!");
+        logger.warn("Not supported!!!");
         throw new UnsupportedOperationException ();
     }
 
@@ -353,25 +355,25 @@ public class UDTSocket extends Socket {
 
     @Override
     public int getSoLinger () throws SocketException {
-        logger.warning("Not supported!!!");
+        logger.warn("Not supported!!!");
         throw new UnsupportedOperationException ();
     }
 
     @Override
     public synchronized int getSoTimeout () throws SocketException {
-        logger.warning("Not supported!!!");
+        logger.warn("Not supported!!!");
         throw new UnsupportedOperationException ();
     }
 
     @Override
     public boolean getTcpNoDelay () throws SocketException {
-        logger.warning("Not supported!!!");
+        logger.warn("Not supported!!!");
         throw new UnsupportedOperationException ();
     }
 
     @Override
     public int getTrafficClass () throws SocketException {
-        logger.warning("Not supported!!!");
+        logger.warn("Not supported!!!");
         throw new UnsupportedOperationException ();
     }
 
@@ -409,53 +411,53 @@ public class UDTSocket extends Socket {
 
     @Override
     public void sendUrgentData (final int data) throws IOException {
-        logger.warning("Not supported!!!");
+        logger.warn("Not supported!!!");
         throw new UnsupportedOperationException ();
     }
 
     @Override
     public void setKeepAlive (final boolean on) throws SocketException {
-        logger.warning("Not supported!!!");
+        logger.warn("Not supported!!!");
         throw new UnsupportedOperationException ();
     }
 
     @Override
     public void setOOBInline (final boolean on) throws SocketException {
-        logger.warning("Not supported!!!");
+        logger.warn("Not supported!!!");
         throw new UnsupportedOperationException ();
     }
 
     @Override
     public void setPerformancePreferences (final int connectionTime,
         final int latency, final int bandwidth) {
-        logger.warning("Not supported!!!");
+        logger.warn("Not supported!!!");
         throw new UnsupportedOperationException ();
     }
 
     @Override
     public synchronized void setReceiveBufferSize (final int size) 
         throws SocketException {
-        logger.warning("Not supported!!!");
+        logger.warn("Not supported!!!");
         throw new UnsupportedOperationException ();
     }
 
     @Override
     public void setReuseAddress (final boolean on) throws SocketException {
-        logger.warning("Not supported!!!");
+        logger.warn("Not supported!!!");
         throw new UnsupportedOperationException ();
     }
 
     @Override
     public synchronized void setSendBufferSize (final int size) 
         throws SocketException {
-        logger.warning("Not supported!!!");
+        logger.warn("Not supported!!!");
         throw new UnsupportedOperationException ();
     }
 
     @Override
     public void setSoLinger (final boolean on, final int linger) 
         throws SocketException {
-        logger.warning("Not supported!!!");
+        logger.warn("Not supported!!!");
         throw new UnsupportedOperationException ();
     }
 
@@ -480,7 +482,7 @@ public class UDTSocket extends Socket {
 
     @Override
     public void setTrafficClass (final int tc) throws SocketException {
-        logger.warning("Not supported!!!");
+        logger.warn("Not supported!!!");
         throw new UnsupportedOperationException ();
     }
 
