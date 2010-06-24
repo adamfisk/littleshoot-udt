@@ -131,7 +131,7 @@ public class TestServerSocket extends Application{
 		public RequestRunner(final Socket sock){
 			this.socket= sock;
 			format.setMaximumFractionDigits(3);
-			memMapped=true;
+			memMapped=false;
 		}
 		
         
