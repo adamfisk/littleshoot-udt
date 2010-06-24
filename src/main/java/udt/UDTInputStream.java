@@ -199,8 +199,10 @@ public class UDTInputStream extends InputStream {
                 return -1;
             }
             if(expectMoreData.get() || !appData.isEmpty()) {
-                log.info("Returning 0");
+                log.info("Waiting for more data");
                 //return 0;
+                // Wait for more data.
+                Thread.sleep(200);
                 return read(target, off, len);
             }
             log.info("Reached end -- no more data!!");
@@ -251,8 +253,11 @@ public class UDTInputStream extends InputStream {
                 return -1;
             }
             if(expectMoreData.get() || !appData.isEmpty()) {
-                log.info("Returning 0");
-                return 0;
+                log.info("Waiting for more data");
+                Thread.sleep(200);
+                return read(target);
+                //log.info("Returning 0");
+                //return 0;
             }
             log.info("Reached end -- no more data!!");
             //no more data
