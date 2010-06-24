@@ -200,7 +200,8 @@ public class UDTInputStream extends InputStream {
             }
             if(expectMoreData.get() || !appData.isEmpty()) {
                 log.info("Returning 0");
-                return 0;
+                //return 0;
+                return read(target, off, len);
             }
             log.info("Reached end -- no more data!!");
             //no more data
@@ -233,17 +234,29 @@ public class UDTInputStream extends InputStream {
 
 				//if no more space left in target, exit now
 				if(read==target.length){
+				    log.info("Returning amount read: "+read);
 					return read;
 				}
 
 				updateCurrentChunk(blocking && read==0);
 			}
 
-			if(read>0)return read;
-			if(closed)return -1;
-			if(expectMoreData.get() || !appData.isEmpty())return 0;
-			//no more data
-			return -1;
+
+            if(read>0) {
+                log.info("Returning positive read");
+                return read;
+            }
+            if(closed) {
+                log.info("Closed, returning -1");
+                return -1;
+            }
+            if(expectMoreData.get() || !appData.isEmpty()) {
+                log.info("Returning 0");
+                return 0;
+            }
+            log.info("Reached end -- no more data!!");
+            //no more data
+            return -1;
 
 		}catch(Exception ex){
 			IOException e= new IOException();
