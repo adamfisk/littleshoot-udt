@@ -128,20 +128,17 @@ public class TestServerSocket extends Application{
 		
 		private final NumberFormat format=NumberFormat.getNumberInstance();
 		
-		private final boolean memMapped;
-		
 		public RequestRunner(final Socket sock){
 			this.socket= sock;
 			format.setMaximumFractionDigits(3);
-			memMapped=false;
 		}
 		
         
         public void run(){
             try{
                 logger.info("Handling request from "+socket.getRemoteSocketAddress());
-                InputStream in=socket.getInputStream();
-                OutputStream out=socket.getOutputStream();
+                final InputStream in = socket.getInputStream();
+                final OutputStream out = socket.getOutputStream();
                 byte[]readBuf=new byte[32768];
                 ByteBuffer bb=ByteBuffer.wrap(readBuf);
 
@@ -165,13 +162,10 @@ public class TestServerSocket extends Application{
                     out.write(PacketUtil.encode(size));
                     long start=System.currentTimeMillis();
                     //and send the file
-                    if(memMapped){
-                        copyFile(file,out);
-                    }else{
-                        fis=new FileInputStream(file);
-                        IoUtils.copy(fis, out, size);
+                    fis=new FileInputStream(file);
+                    IoUtils.copy(fis, out, size);
                         //Util.copy(fis, out, size, false);
-                    }
+
                     long end=System.currentTimeMillis();
                     System.out.println(((UDTSocket)socket).getSession().getStatistics().toString());
                     double rate=1000.0*size/1024/1024/(end-start);
@@ -218,12 +212,9 @@ public class TestServerSocket extends Application{
 					out.write(PacketUtil.encode(size));
 					long start=System.currentTimeMillis();
 					//and send the file
-					if(memMapped){
-						copyFile(file,out);
-					}else{
-						fis=new FileInputStream(file);
-						Util.copy(fis, out, size, false);
-					}
+					fis=new FileInputStream(file);
+					Util.copy(fis, out, size, false);
+
 					long end=System.currentTimeMillis();
 					System.out.println(((UDTSocket)socket).getSession().getStatistics().toString());
 					double rate=1000.0*size/1024/1024/(end-start);
@@ -243,20 +234,5 @@ public class TestServerSocket extends Application{
 			}
 		}
 	}
-	
-	
-	private static void copyFile(File file, OutputStream os)throws Exception{
-		FileChannel c=new RandomAccessFile(file,"r").getChannel();
-		MappedByteBuffer b=c.map(MapMode.READ_ONLY, 0, file.length());
-		byte[]buf=new byte[1024*1024];
-		int len=0;
-		while(true){
-			len=Math.min(buf.length, b.remaining());
-			b.get(buf, 0, len);
-			os.write(buf, 0, len);
-			if(b.remaining()==0)break;
-		}
-		os.flush();
-	}	
 	
 }
