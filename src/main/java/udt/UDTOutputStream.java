@@ -34,6 +34,7 @@ package udt;
 import java.io.IOException;
 import java.io.OutputStream;
 
+import org.lastbamboo.common.util.ThreadUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -104,7 +105,7 @@ public class UDTOutputStream extends OutputStream{
 	 */
 	@Override
 	public void close()throws IOException{
-	    log.info("Closing output stream");
+	    log.info("Closing output stream from: "+ThreadUtils.dumpStack());
 		if(closed)return;
 		closed=true;
 	}

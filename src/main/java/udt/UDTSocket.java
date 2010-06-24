@@ -102,10 +102,12 @@ public class UDTSocket extends Socket {
 		this.sender = sender;
 	}
 
+	/*
 	public void setActive(boolean active) {
 	    logger.info("Setting active to "+active);
 		this.active = active;
 	}
+	*/
 
 	public boolean isActive() {
 		return active;
@@ -178,7 +180,7 @@ public class UDTSocket extends Socket {
 				throw new IOException("Queue full");
 			}
 		}
-		if(length>0)active=true;
+		if(length>0)active = true;
 	}
 	/**
 	 * will block until the outstanding packets have really been sent out
@@ -260,13 +262,14 @@ public class UDTSocket extends Socket {
     @Override
     public InputStream getInputStream () throws IOException {
         logger.info("Getting input stream");
+        /*
         if (isClosed())
             throw new SocketException("Socket is closed");
         if (!isConnected())
             throw new SocketException("Socket is not connected");
         if (isInputShutdown())
             throw new SocketException("Socket input is shutdown");
-
+        */
         if(inputStream==null){
             inputStream=new UDTInputStream(this);
         }
@@ -387,6 +390,9 @@ public class UDTSocket extends Socket {
     public boolean isClosed () {
         logger.info("Called -- returning--"+!active);
         //return !active;
+        
+        // Returning false here since the connection is only seen as active
+        // when we've written something.
         return false;
     }
 

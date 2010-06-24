@@ -38,6 +38,7 @@ import java.util.concurrent.PriorityBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import org.lastbamboo.common.util.ThreadUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -155,13 +156,16 @@ public class UDTInputStream extends InputStream {
         if (target == null) {
             throw new NullPointerException();
         } else if (off < 0 || len < 0 || len > target.length - off) {
+            log.error("Throwing index out of bounds!");
             throw new IndexOutOfBoundsException();
         } else if (len == 0) {
             return 0;
         }
         try{
             int read=0;
+            log.info("About to update chunk");
             updateCurrentChunk(false);
+            log.info("Updated chunk...starting while");
             while(currentChunk!=null){
                 final byte[] data = currentChunk.data;
                 final int targetMax = target.length - read - off;
@@ -179,15 +183,26 @@ public class UDTInputStream extends InputStream {
 
                 //if no more space left in target, exit now
                 if(read == target.length || read == len){
+                    log.info("Returning read of: "+read);
                     return read;
                 }
 
                 updateCurrentChunk(blocking && read==0);
             }
 
-            if(read>0)return read;
-            if(closed)return -1;
-            if(expectMoreData.get() || !appData.isEmpty())return 0;
+            if(read>0) {
+                log.info("Returning positive read");
+                return read;
+            }
+            if(closed) {
+                log.info("Closed, returning -1");
+                return -1;
+            }
+            if(expectMoreData.get() || !appData.isEmpty()) {
+                log.info("Returning 0");
+                return 0;
+            }
+            log.info("Reached end -- no more data!!");
             //no more data
             return -1;
 
@@ -297,7 +312,7 @@ public class UDTInputStream extends InputStream {
 
 	@Override
 	public void close()throws IOException {
-	    log.info("Closing input stream!!");
+	    log.info("Closing input stream from: "+ThreadUtils.dumpStack());
 		if(closed) return;
 		closed=true;
 		noMoreData();
