@@ -54,7 +54,7 @@ public class UDTOutputStream extends OutputStream{
 	
 	@Override
 	public void write(int args)throws IOException {
-	    
+	    log.info("Writing single byte");
 		checkClosed();
 		socket.doWrite(new byte[]{(byte)args});
 	}
