@@ -109,7 +109,7 @@ public class TestSocket extends Application{
             bb.put((byte)0);
             
             out.write(readBuf, 0, bb.position());
-            out.flush();
+            //out.flush();
             //out.write("HEAD /uri-res/N2R?urn:sha1:TIV6N2VEORKK4BDY663FBYS6CK7LUWOB HTTP/1.1".getBytes());
             
             

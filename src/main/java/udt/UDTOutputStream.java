@@ -75,7 +75,8 @@ public class UDTOutputStream extends OutputStream{
 	
 	@Override
 	public void flush()throws IOException {
-	    log.info("Flushing");
+	    log.info("Flushing -- IGNORING!!");
+	    /*
 		try{
 			checkClosed();
 			socket.flush();
@@ -84,6 +85,7 @@ public class UDTOutputStream extends OutputStream{
 			io.initCause(ie);
 			throw io;
 		}
+		*/
 	}
 	
 	/**
