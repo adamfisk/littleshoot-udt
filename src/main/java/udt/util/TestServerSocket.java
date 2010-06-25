@@ -144,6 +144,10 @@ public class TestServerSocket extends Application{
         public void run(){
             try{
                 log.info("Handling request from "+socket.getRemoteSocketAddress());
+                if (true) {
+                    requestAndResponseOnSocket(socket);
+                    return;
+                }
                 final InputStream in = socket.getInputStream();
                 final OutputStream out = socket.getOutputStream();
                 byte[]readBuf=new byte[32768];
