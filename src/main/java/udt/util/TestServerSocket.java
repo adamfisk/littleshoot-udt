@@ -32,9 +32,12 @@
 
 package udt.util;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.RandomAccessFile;
 import java.net.InetAddress;
@@ -48,7 +51,10 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.logging.Logger;
 
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
 import org.lastbamboo.common.util.IoUtils;
+import org.slf4j.LoggerFactory;
 
 import udt.UDTReceiver;
 import udt.UDTServerSocket;
@@ -64,6 +70,7 @@ import udt.packets.PacketUtil;
  */
 public class TestServerSocket extends Application{
 
+    private final static org.slf4j.Logger log = LoggerFactory.getLogger(TestServerSocket.class);
 	private final int serverPort;
 
 	//TODO configure pool size
@@ -136,7 +143,7 @@ public class TestServerSocket extends Application{
         
         public void run(){
             try{
-                logger.info("Handling request from "+socket.getRemoteSocketAddress());
+                log.info("Handling request from "+socket.getRemoteSocketAddress());
                 final InputStream in = socket.getInputStream();
                 final OutputStream out = socket.getOutputStream();
                 byte[]readBuf=new byte[32768];
@@ -178,16 +185,42 @@ public class TestServerSocket extends Application{
                     //socket.getSender().stop();
                     if(fis!=null)fis.close();
                 }
-                logger.info("Finished request from "+((UDTSocket)socket).getSession().getDestination());
+                log.info("Finished request from "+((UDTSocket)socket).getSession().getDestination());
             }catch(Exception ex){
                 ex.printStackTrace();
                 throw new RuntimeException(ex);
             }
         }
         
+        private void requestAndResponseOnSocket(final Socket sock) 
+            throws IOException {
+            final InputStream is = sock.getInputStream();
+            final OutputStream os = sock.getOutputStream();
+            
+            final BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+            String curLine = reader.readLine();
+            while (StringUtils.isNotBlank(curLine)) {
+                log.info("curLine: "+curLine);
+                curLine = reader.readLine();
+            }
+            
+            os.write("HTTP/1.1 200 OK\r\n".getBytes());
+            os.write("Content-Length: 59597064\r\n".getBytes());
+            //os.write("\r\n".getBytes());
+            //os.write("\r\n".getBytes());
+            os.write("\r\n".getBytes());
+            os.flush();
+            
+            final FileInputStream fis = new FileInputStream(new File("boost.tgz"));
+            IOUtils.copy(fis, os);
+            fis.close();
+            is.close();
+            os.close();
+        }
+        
 		public void run2(){
 			try{
-				logger.info("Handling request from "+socket.getRemoteSocketAddress());
+				log.info("Handling request from "+socket.getRemoteSocketAddress());
 				InputStream in=socket.getInputStream();
 				OutputStream out=socket.getOutputStream();
 				byte[]readBuf=new byte[32768];
@@ -227,7 +260,7 @@ public class TestServerSocket extends Application{
 					//socket.getSender().stop();
 					if(fis!=null)fis.close();
 				}
-				logger.info("Finished request from "+((UDTSocket)socket).getSession().getDestination());
+				log.info("Finished request from "+((UDTSocket)socket).getSession().getDestination());
 			}catch(Exception ex){
 				ex.printStackTrace();
 				throw new RuntimeException(ex);

@@ -32,17 +32,23 @@
 
 package udt.util;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.nio.ByteBuffer;
 import java.text.NumberFormat;
 
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
 import org.lastbamboo.common.util.IoUtils;
-import org.lastbamboo.common.util.WriteListener;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import udt.UDTClient;
 import udt.UDTReceiver;
@@ -57,6 +63,8 @@ import udt.UDTReceiver;
  */
 public class TestSocket extends Application{
 
+    private final Logger log = LoggerFactory.getLogger(getClass());
+    
 	private final int serverPort;
 	private final String serverHost;
 	private final String remoteFile;
@@ -73,7 +81,113 @@ public class TestSocket extends Application{
 		format.setMaximumFractionDigits(3);
 	}
 	
+
     public void run(){
+        configure();
+        try{
+            UDTReceiver.connectionExpiryDisabled=true;
+            InetAddress myHost=localIP!=null?InetAddress.getByName(localIP):InetAddress.getLocalHost();
+            UDTClient client=localPort!=-1?new UDTClient(myHost,localPort):new UDTClient(myHost);
+            client.connect(serverHost, serverPort);
+            
+            Socket sock = client.getSocket();
+            
+            if (true) {
+                requestAndResponseOnSocket(sock);
+                return;
+            }
+            InputStream in = sock.getInputStream();
+            OutputStream out = sock.getOutputStream();
+            /*
+            byte[]readBuf=new byte[1024];
+            ByteBuffer bb=ByteBuffer.wrap(readBuf);
+            System.out.println("[ReceiveFile] Requesting file "+remoteFile);
+            //send name file info
+            byte[]fName=remoteFile.getBytes();
+            bb.putInt(fName.length+1);
+            
+            bb.put(fName);
+            bb.put((byte)0);
+            
+            out.write(readBuf, 0, bb.position());
+            out.flush();
+            */
+            out.write("HEAD /uri-res/N2R?urn:sha1:TIV6N2VEORKK4BDY663FBYS6CK7LUWOB HTTP/1.1".getBytes());
+            
+            
+            //pause the sender to save some CPU time
+            //out.pauseOutput();
+            
+            //read size info (an 4-byte int) 
+            byte[]sizeInfo=new byte[4];
+            
+            while(in.read(sizeInfo)==0);
+            
+            long size=ByteBuffer.wrap(sizeInfo).getInt();
+            
+            System.out.println("FILE SIZE: "+size);
+            final FileOutputStream fos=new FileOutputStream(remoteFile+".downloaded");
+            
+            System.out.println("[ReceiveFile] Reading <"+size+"> bytes.");
+            //long start = System.currentTimeMillis();
+            
+            //and read the file data
+            //Util.copy(in, fos, size, false);
+            IoUtils.copy(in, fos, size);
+            //long end = System.currentTimeMillis();
+            //double rate=1000.0*size/1024/1024/(end-start);
+            //System.out.println("[ReceiveFile] Rate: "+format.format(rate)+" MBytes/sec. "
+            //        +format.format(8*rate)+" MBit/sec.");
+        
+            client.shutdown();
+            
+            if(verbose)System.out.println(client.getStatistics());
+            
+            
+            /*
+            in.close();
+            out.close();
+            sock.close();
+            fos.close();
+            */
+            /*
+            IoUtils.copy(in, fos, new WriteListener() {
+                private int totalBytes = 0;
+                public void onBytesRead(final int numBytes) {
+                    System.out.println("Wrote "+numBytes+" bytes...");
+                    totalBytes += numBytes;
+                    if (totalBytes ==)
+                }
+            });
+            */
+        }
+        catch (final Exception e) {
+            
+        }
+    }
+    
+    private void requestAndResponseOnSocket(final Socket sock) 
+        throws IOException {
+        final InputStream is = sock.getInputStream();
+        final OutputStream os = sock.getOutputStream();
+        os.write("HEAD /uri-res/N2R?urn:sha1:TIV6N2VEORKK4BDY663FBYS6CK7LUWOB HTTP/1.1\r\n\r\n".getBytes());
+        os.flush();
+        
+        final BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+        String curLine = reader.readLine();
+        while (StringUtils.isNotBlank(curLine)) {
+            log.info("curLine: "+curLine);
+            curLine = reader.readLine();
+        }
+
+        final FileOutputStream fos = new FileOutputStream("testFile.downloaded");
+        IOUtils.copy(is, fos);
+        fos.close();
+        is.close();
+        os.close();
+    }
+	
+    public void run15(){
         configure();
         try{
             UDTReceiver.connectionExpiryDisabled=true;
@@ -97,6 +211,7 @@ public class TestSocket extends Application{
             
             out.write(readBuf, 0, bb.position());
             out.flush();
+            
             
             //pause the sender to save some CPU time
             //out.pauseOutput();
