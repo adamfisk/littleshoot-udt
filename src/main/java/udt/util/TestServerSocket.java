@@ -196,7 +196,7 @@ public class TestServerSocket extends Application{
         }
         
         private void requestAndResponseOnSocket(final Socket sock) 
-            throws IOException {
+            throws IOException, InterruptedException {
             final InputStream is = sock.getInputStream();
             final OutputStream os = sock.getOutputStream();
             
@@ -217,6 +217,8 @@ public class TestServerSocket extends Application{
             final File file = new File("visualvm.zip");
             final FileInputStream fis = new FileInputStream(file);
             IoUtils.copy(fis, os, file.length());
+            os.flush();
+            Thread.sleep(4000);
             //IOUtils.copy(fis, os);
             fis.close();
             is.close();
