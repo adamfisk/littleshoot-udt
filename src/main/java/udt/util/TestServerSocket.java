@@ -211,7 +211,7 @@ public class TestServerSocket extends Application{
             os.write("\r\n".getBytes());
             os.flush();
             
-            final FileInputStream fis = new FileInputStream(new File("boost.tgz"));
+            final FileInputStream fis = new FileInputStream(new File("visualvm.zip"));
             IOUtils.copy(fis, os);
             fis.close();
             is.close();

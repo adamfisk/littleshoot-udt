@@ -180,7 +180,7 @@ public class TestSocket extends Application{
             curLine = reader.readLine();
         }
 
-        final FileOutputStream fos = new FileOutputStream("testFile.downloaded");
+        final FileOutputStream fos = new FileOutputStream("visualvm.zip.downloaded");
         IOUtils.copy(is, fos);
         fos.close();
         is.close();
