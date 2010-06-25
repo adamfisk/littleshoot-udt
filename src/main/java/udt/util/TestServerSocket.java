@@ -51,7 +51,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.logging.Logger;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.lastbamboo.common.util.IoUtils;
 import org.slf4j.LoggerFactory;
@@ -213,10 +212,12 @@ public class TestServerSocket extends Application{
             //os.write("\r\n".getBytes());
             //os.write("\r\n".getBytes());
             os.write("\r\n".getBytes());
-            os.flush();
+            //os.flush();
             
-            final FileInputStream fis = new FileInputStream(new File("visualvm.zip"));
-            IOUtils.copy(fis, os);
+            final File file = new File("visualvm.zip");
+            final FileInputStream fis = new FileInputStream(file);
+            IoUtils.copy(fis, os, file.length());
+            //IOUtils.copy(fis, os);
             fis.close();
             is.close();
             os.close();
