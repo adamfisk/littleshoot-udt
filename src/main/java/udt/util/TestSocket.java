@@ -44,7 +44,6 @@ import java.net.Socket;
 import java.nio.ByteBuffer;
 import java.text.NumberFormat;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.lastbamboo.common.util.IoUtils;
 import org.slf4j.Logger;
@@ -94,6 +93,7 @@ public class TestSocket extends Application{
             
             if (true) {
                 requestAndResponseOnSocket(sock);
+                client.shutdown();
                 return;
             }
             InputStream in = sock.getInputStream();
@@ -179,9 +179,12 @@ public class TestSocket extends Application{
             log.info("curLine: "+curLine);
             curLine = reader.readLine();
         }
-
-        final FileOutputStream fos = new FileOutputStream("visualvm.zip.downloaded");
-        IOUtils.copy(is, fos);
+        final File file = new File("visualvm.zip.downloaded");
+        file.delete();
+        final FileOutputStream fos = new FileOutputStream(file);
+        //IOUtils.copy(is, fos);
+        IoUtils.copy(is, fos, 10393398);
+        
         fos.close();
         is.close();
         os.close();

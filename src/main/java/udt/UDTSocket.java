@@ -194,9 +194,12 @@ public class UDTSocket extends Socket {
 		    return;
 		    }
 		final long seqNo=sender.getCurrentSequenceNumber();
-		if(seqNo<0)throw new IllegalStateException();
+		if (seqNo < 0) {
+		    logger.info("Sequence number less than zero??!!");
+		    throw new IllegalStateException();
+		}
 		logger.info("Flushing...checking for sent out...");
-		while(!sender.isSentOut(seqNo)){
+		while(!sender.isSentOut(seqNo)) {
 			Thread.sleep(5);
 		}
 		if(seqNo>-1){

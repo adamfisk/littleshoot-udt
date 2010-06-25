@@ -430,8 +430,8 @@ public class UDTSender {
 		return sequenceNumber<=lastAckSequenceNumber;
 	}
 
-	boolean isSentOut(long sequenceNumber){
-		return largestSentSequenceNumber>=sequenceNumber;
+	boolean isSentOut(final long sequenceNumber){
+		return largestSentSequenceNumber >= sequenceNumber;
 
 	}
 

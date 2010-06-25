@@ -207,22 +207,24 @@ public class TestServerSocket extends Application{
                 curLine = reader.readLine();
             }
             
+            final File file = new File("visualvm.zip");
+            
             os.write("HTTP/1.1 200 OK\r\n".getBytes());
-            os.write("Content-Length: 59597064\r\n".getBytes());
+            os.write(("Content-Length: "+file.length()+"\r\n").getBytes());
             //os.write("\r\n".getBytes());
             //os.write("\r\n".getBytes());
             os.write("\r\n".getBytes());
             //os.flush();
             
-            final File file = new File("visualvm.zip");
+            
             final FileInputStream fis = new FileInputStream(file);
-            IoUtils.copy(fis, os, file.length());
-            os.flush();
-            Thread.sleep(4000);
-            //IOUtils.copy(fis, os);
-            fis.close();
-            is.close();
-            os.close();
+            try {
+                IoUtils.copy(fis, os, file.length());
+            }
+            finally {
+                sock.close();
+                fis.close();
+            }
         }
         
 		public void run2(){
