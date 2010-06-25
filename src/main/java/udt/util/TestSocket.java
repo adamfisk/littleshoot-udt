@@ -91,14 +91,13 @@ public class TestSocket extends Application{
             
             Socket sock = client.getSocket();
             
-            if (true) {
+            if (false) {
                 requestAndResponseOnSocket(sock);
                 client.shutdown();
                 return;
             }
             InputStream in = sock.getInputStream();
             OutputStream out = sock.getOutputStream();
-            /*
             byte[]readBuf=new byte[1024];
             ByteBuffer bb=ByteBuffer.wrap(readBuf);
             System.out.println("[ReceiveFile] Requesting file "+remoteFile);
@@ -111,8 +110,7 @@ public class TestSocket extends Application{
             
             out.write(readBuf, 0, bb.position());
             out.flush();
-            */
-            out.write("HEAD /uri-res/N2R?urn:sha1:TIV6N2VEORKK4BDY663FBYS6CK7LUWOB HTTP/1.1".getBytes());
+            //out.write("HEAD /uri-res/N2R?urn:sha1:TIV6N2VEORKK4BDY663FBYS6CK7LUWOB HTTP/1.1".getBytes());
             
             
             //pause the sender to save some CPU time

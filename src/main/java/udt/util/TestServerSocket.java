@@ -143,7 +143,7 @@ public class TestServerSocket extends Application{
         public void run(){
             try{
                 log.info("Handling request from "+socket.getRemoteSocketAddress());
-                if (true) {
+                if (false) {
                     requestAndResponseOnSocket(socket);
                     return;
                 }
