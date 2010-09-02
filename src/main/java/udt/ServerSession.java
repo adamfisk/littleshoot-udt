@@ -36,8 +36,9 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.SocketException;
 import java.net.UnknownHostException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import udt.packets.ConnectionHandshake;
 import udt.packets.Destination;
@@ -49,8 +50,8 @@ import udt.packets.Shutdown;
  */
 public class ServerSession extends UDTSession {
 
-	private static final Logger logger=Logger.getLogger(ServerSession.class.getName());
-
+    private final Logger logger = LoggerFactory.getLogger(getClass());
+    
 	private final UDPEndPoint endPoint;
 
 	//last received packet (for testing purposes)
@@ -83,12 +84,12 @@ public class ServerSession extends UDTSession {
 					cc.init();
 				}catch(Exception uhe){
 					//session is invalid
-					logger.log(Level.SEVERE,"",uhe);
+					logger.error("Error receiving",uhe);
 					setState(invalid);
 				}
 			}catch(IOException ex){
 				//session invalid
-				logger.log(Level.WARNING,"Error processing ConnectionHandshake",ex);
+				logger.warn("Error processing ConnectionHandshake",ex);
 				setState(invalid);
 			}
 			return;
@@ -105,15 +106,14 @@ public class ServerSession extends UDTSession {
 				//nothing to do here
 				return;
 			}else if (packet instanceof Shutdown) {
-				try{
-					socket.getReceiver().stop();
-				}catch(IOException ex){
-					logger.log(Level.WARNING,"",ex);
-				}
 				setState(shutdown);
-				System.out.println("SHUTDOWN ***");
 				active = false;
 				logger.info("Connection shutdown initiated by the other side.");
+                try {
+                    getSocket().close();
+                } catch (IOException e) {
+                    logger.warn("Exception closing socket", e);
+                }
 				return;
 			}
 
@@ -126,7 +126,7 @@ public class ServerSession extends UDTSession {
 					}
 				}catch(Exception ex){
 					//session invalid
-					logger.log(Level.SEVERE,"",ex);
+					logger.error("Error forwarding packet",ex);
 					setState(invalid);
 				}
 			}

@@ -34,8 +34,9 @@ package udt;
 
 import java.io.IOException;
 import java.net.SocketException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import udt.packets.ConnectionHandshake;
 import udt.packets.Destination;
@@ -50,7 +51,7 @@ import udt.packets.Shutdown;
  */
 public class ClientSession extends UDTSession {
 
-	private static final Logger logger=Logger.getLogger(ClientSession.class.getName());
+	private final Logger logger = LoggerFactory.getLogger(getClass());
 
 	private UDPEndPoint endPoint;
 	
@@ -97,7 +98,7 @@ public class ClientSession extends UDTSession {
 				destination.setSocketID(peerSocketID);
 				socket=new UDTSocket(endPoint,this);
 			}catch(Exception ex){
-				logger.log(Level.WARNING,"Error creating socket",ex);
+				logger.warn("Error creating socket",ex);
 				setState(invalid);
 			}
 			return;
@@ -108,6 +109,11 @@ public class ClientSession extends UDTSession {
 				setState(shutdown);
 				active=false;
 				logger.info("Connection shutdown initiated by the other side.");
+				try {
+                    getSocket().close();
+                } catch (IOException e) {
+                    logger.warn("Exception closing socket", e);
+                }
 				return;
 			}
 			active = true;
@@ -119,7 +125,7 @@ public class ClientSession extends UDTSession {
 				}
 			}catch(Exception ex){
 				//session is invalid
-				logger.log(Level.SEVERE,"Error in "+toString(),ex);
+				logger.error("Error receiving", ex);
 				setState(invalid);
 			}
 			return;

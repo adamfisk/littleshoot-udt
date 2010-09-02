@@ -149,7 +149,7 @@ public abstract class UDTSession {
 	}
 
 	public void setState(int state) {
-		logger.info(toString()+" connection state CHANGED to <"+state+">");
+		logger.info("Connection state CHANGED to <"+state+">");
 		this.state = state;
 	}
 	
