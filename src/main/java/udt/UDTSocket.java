@@ -45,6 +45,7 @@ import java.util.concurrent.TimeUnit;
 import org.slf4j.LoggerFactory;
 
 import udt.packets.DataPacket;
+import udt.packets.Shutdown;
 
 /**
  * UDTSocket is analogous to a normal java.net.Socket, it provides input and 
@@ -233,9 +234,32 @@ public class UDTSocket extends Socket {
     @Override
     public synchronized void close () throws IOException {
         logger.info("Called...");
-        if(inputStream!=null)inputStream.close();
-        if(outputStream!=null)outputStream.close();
-        active=false;
+        this.active = false;
+        
+        final Shutdown shutdown = new Shutdown();
+        shutdown.setDestinationID(this.session.getDestination().getSocketID());
+        shutdown.setSession(this.session);
+        try{
+            this.endpoint.doSend(shutdown);
+        }
+        catch(final IOException e) {
+            logger.error("Exception shutting down", e);
+        }
+        
+        // Take a second to allow the shutdown message to go through.
+        try {
+            Thread.sleep(300);
+        } catch (final InterruptedException e) {
+            logger.error("Sleep interrupted?", e);
+        }
+        
+        if (inputStream!=null) inputStream.close();
+        if (outputStream!=null) outputStream.close();
+        
+        this.receiver.stop();
+        this.sender.stop();
+        
+        this.endpoint.stop();
     }
 
     @Override

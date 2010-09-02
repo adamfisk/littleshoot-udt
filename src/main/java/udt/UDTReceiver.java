@@ -575,9 +575,9 @@ public class UDTReceiver {
 
 	public void stop()throws IOException{
 		stopped=true;
-		session.getSocket().close();
+		//session.getSocket().close();
 		//stop our sender as well
-		session.getSocket().getSender().stop();
+		//session.getSocket().getSender().stop();
 	}
 
 	public String toString(){

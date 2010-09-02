@@ -45,8 +45,9 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import udt.packets.ConnectionHandshake;
 import udt.packets.Destination;
@@ -60,7 +61,8 @@ import udt.util.UDTThreadFactory;
  */
 public class UDPEndPoint {
 
-	private static final Logger logger=Logger.getLogger(ClientSession.class.getName());
+	//private static final Logger logger=Logger.getLogger(ClientSession.class.getName());
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
 	private final int port;
 
@@ -280,9 +282,9 @@ public class UDPEndPoint {
 							addSession(session.getSocketID(),session);
 							//TODO need to check peer to avoid duplicate server session
 							if(serverSocketMode){
-								logger.fine("Pooling new request.");
+								logger.debug("Pooling new request.");
 								sessionHandoff.put(session);
-								logger.fine("Request taken for processing.");
+								logger.debug("Request taken for processing.");
 							}
 						}
 						peer.setSocketID(((ConnectionHandshake)packet).getSocketID());
@@ -301,30 +303,32 @@ public class UDPEndPoint {
 							lastDestID=dest;
 						}
 						if(session==null){
-							logger.warning("Unknown session <"+packet.getDestinationID()+"> requested from <"+peer+"> packet type "+packet.getClass().getName());
+							logger.warn("Unknown session <"+packet.getDestinationID()+"> requested from <"+peer+"> packet type "+packet.getClass().getName());
 						}
 						else{
 							session.received(packet,peer);
 						}
 					}
 				}catch(SocketException ex){
-					logger.log(Level.INFO, "SocketException: "+ex.getMessage());
-				}catch(SocketTimeoutException ste){
+					//logger.log(Level.INFO, "SocketException: "+ex.getMessage());
+				    logger.warn("Socket error", ex);
+				}catch(SocketTimeoutException e){
 					//can safely ignore... we will retry until the endpoint is stopped
+				    logger.warn("Socket timeout", e);
 				}
 
-			}catch(Exception ex){
-				logger.log(Level.WARNING, "Got: "+ex.getMessage(),ex);
+			}catch(Exception e){
+				logger.warn("Receive error!!", e);
 			}
 		}
 	}
 
-	protected void doSend(final UDTPacket packet) throws IOException{
+	protected void doSend(final UDTPacket packet) throws IOException {
 		final byte[] data = packet.getEncoded();
 		final DatagramPacket dgp = packet.getSession().getDatagram();
 		dgp.setData(data);
 		dgSocket.send(dgp);
-		logger.info("Finished send");
+		logger.debug("Finished send");
 	}
 
 	public String toString(){
