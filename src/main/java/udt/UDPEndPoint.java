@@ -319,9 +319,9 @@ public class UDPEndPoint {
 		}
 	}
 
-	protected void doSend(UDTPacket packet)throws IOException{
-		byte[]data=packet.getEncoded();
-		DatagramPacket dgp = packet.getSession().getDatagram();
+	protected void doSend(final UDTPacket packet) throws IOException{
+		final byte[] data = packet.getEncoded();
+		final DatagramPacket dgp = packet.getSession().getDatagram();
 		dgp.setData(data);
 		dgSocket.send(dgp);
 		logger.info("Finished send");

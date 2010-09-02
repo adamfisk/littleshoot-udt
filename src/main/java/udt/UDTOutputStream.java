@@ -108,8 +108,7 @@ public class UDTOutputStream extends OutputStream{
 	@Override
 	public void close()throws IOException{
 	    log.info("Closing output stream from: "+ThreadUtils.dumpStack());
-		if(closed)return;
-		closed=true;
+		closed = true;
 	}
 	
 	private void checkClosed() throws IOException {

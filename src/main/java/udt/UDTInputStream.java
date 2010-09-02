@@ -169,9 +169,9 @@ public class UDTInputStream extends InputStream {
         }
         try{
             int read=0;
-            log.info("About to update chunk");
+            log.debug("About to update chunk");
             updateCurrentChunk(false);
-            log.info("Updated chunk...starting while");
+            log.debug("Updated chunk...starting while");
             while(currentChunk!=null){
                 final byte[] data = currentChunk.data;
                 final int targetMax = target.length - read - off;
@@ -196,7 +196,7 @@ public class UDTInputStream extends InputStream {
                 updateCurrentChunk(blocking && read==0);
             }
 
-            if(read>0) {
+            if (read > 0) {
                 log.info("Returning positive read");
                 return read;
             }
