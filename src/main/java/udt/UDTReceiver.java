@@ -370,7 +370,8 @@ public class UDTReceiver {
 			onAck2PacketReceived(ack2);
 		}
 
-		else if (p instanceof Shutdown){
+		else if (p instanceof Shutdown) {
+		    logger.info("Received shutdown packet!!");
 			onShutdown();
 		}
 
@@ -569,7 +570,8 @@ public class UDTReceiver {
 		this.ackInterval=ackInterval;
 	}
 	
-	protected void onShutdown()throws IOException{
+	protected void onShutdown()throws IOException {
+	    session.getSocket().close();
 		stop();
 	}
 

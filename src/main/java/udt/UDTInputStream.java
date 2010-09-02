@@ -338,7 +338,7 @@ public class UDTInputStream extends InputStream {
 
 	@Override
 	public void close()throws IOException {
-	    log.info("Closing input stream from: "+ThreadUtils.dumpStack());
+	    log.info("Closing input stream.");
 		if(closed) return;
 		closed=true;
 		noMoreData();
