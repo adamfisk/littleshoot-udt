@@ -134,7 +134,7 @@ public class UDPEndPoint {
 		else port=dgSocket.getLocalPort();
 		
 		//set a time out to avoid blocking in doReceive()
-		dgSocket.setSoTimeout(100000);
+		dgSocket.setSoTimeout(30 * 1000);
 		//buffer size
 		dgSocket.setReceiveBufferSize(128*1024);
 	}
