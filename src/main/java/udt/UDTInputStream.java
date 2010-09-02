@@ -60,7 +60,7 @@ public class UDTInputStream extends InputStream {
 
 	//inbound application data, in-order, and ready for reading
 	//by the application
-	private final PriorityBlockingQueue<AppData>appData;
+	private final PriorityBlockingQueue<AppData> appData;
 
 	private final UDTStatistics statistics;
 
@@ -85,7 +85,7 @@ public class UDTInputStream extends InputStream {
 		this.socket=socket;
 		this.statistics=statistics;
 		int capacity=socket!=null? 4*socket.getSession().getFlowWindowSize() : 64 ;
-		appData=new PriorityBlockingQueue<AppData>(capacity);
+		appData = new PriorityBlockingQueue<AppData>(capacity);
 	}
 
 	/**
@@ -153,6 +153,12 @@ public class UDTInputStream extends InputStream {
     public int read(final byte[] target, final int off, final int len) 
         throws IOException {
         log.info("Reading data with offset '"+off+"' and len '"+len+"'");
+        return read(target, off, len, 1);
+    }
+    
+    private int read(final byte[] target, final int off, final int len, 
+        final int numCalls) throws IOException {
+        log.info("Reading data with offset '"+off+"' and len '"+len+"'");
         if (target == null) {
             throw new NullPointerException();
         } else if (off < 0 || len < 0 || len > target.length - off) {
@@ -200,17 +206,15 @@ public class UDTInputStream extends InputStream {
             }
             if(expectMoreData.get() || !appData.isEmpty()) {
                 log.info("Waiting for more data");
-                //return 0;
-                // Wait for more data.
-                Thread.sleep(100);
-                return read(target, off, len);
+                Thread.sleep(100 * numCalls);
+                return read(target, off, len, numCalls + 1);
             }
             log.info("Reached end -- no more data!!");
             //no more data
             return -1;
 
-        }catch(Exception ex){
-            IOException e= new IOException();
+        } catch (final Exception ex){
+            final IOException e= new IOException("Exception during read!!");
             e.initCause(ex);
             throw e;
         }
@@ -219,31 +223,35 @@ public class UDTInputStream extends InputStream {
 	@Override
 	public int read(final byte[]target) throws IOException {
 	    log.info("Reading with straight byte array");
-		try{
-			int read=0;
-			updateCurrentChunk(false);
-			while(currentChunk!=null){
-				byte[]data=currentChunk.data;
-				int length=Math.min(target.length-read,data.length-offset);
-				System.arraycopy(data, offset, target, read, length);
-				read+=length;
-				offset+=length;
-				//check if chunk has been fully read
-				if(offset>=data.length){
-					currentChunk=null;
-					offset=0;
-				}
-
-				//if no more space left in target, exit now
-				if(read==target.length){
-				    log.info("Returning amount read: "+read);
-					return read;
-				}
-
-				updateCurrentChunk(blocking && read==0);
-			}
-
-
+	    return read(target, 1);
+	}
+	
+    private int read(final byte[]target, final int numCalls) throws IOException {
+        log.info("Reading with straight byte array");
+        try{
+            int read=0;
+            updateCurrentChunk(false);
+            while(currentChunk!=null){
+                byte[]data=currentChunk.data;
+                int length=Math.min(target.length-read,data.length-offset);
+                System.arraycopy(data, offset, target, read, length);
+                read+=length;
+                offset+=length;
+                //check if chunk has been fully read
+                if(offset>=data.length){
+                    currentChunk=null;
+                    offset=0;
+                }
+    
+                //if no more space left in target, exit now
+                if(read==target.length){
+                    log.info("Returning amount read: "+read);
+                    return read;
+                }
+    
+                updateCurrentChunk(blocking && read==0);
+            }
+    
             if(read>0) {
                 log.info("Returning positive read");
                 return read;
@@ -254,21 +262,21 @@ public class UDTInputStream extends InputStream {
             }
             if(expectMoreData.get() || !appData.isEmpty()) {
                 log.info("Waiting for more data");
-                Thread.sleep(100);
-                return read(target);
+                Thread.sleep(100 * numCalls);
+                return read(target, numCalls + 1);
                 //log.info("Returning 0");
                 //return 0;
             }
             log.info("Reached end -- no more data!!");
             //no more data
             return -1;
-
-		}catch(Exception ex){
-			IOException e= new IOException();
-			e.initCause(ex);
-			throw e;
-		}
-	}
+    
+        }catch(Exception ex){
+            IOException e= new IOException();
+            e.initCause(ex);
+            throw e;
+        }
+    }
 
 	/**
 	 * Reads the next valid chunk of application data from the queue<br/>
