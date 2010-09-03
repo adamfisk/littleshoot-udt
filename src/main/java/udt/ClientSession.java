@@ -109,11 +109,13 @@ public class ClientSession extends UDTSession {
 				setState(shutdown);
 				active=false;
 				logger.info("Connection shutdown initiated by the other side.");
+				/*
 				try {
                     getSocket().close();
                 } catch (IOException e) {
                     logger.warn("Exception closing socket", e);
                 }
+                */
 				return;
 			}
 			active = true;
