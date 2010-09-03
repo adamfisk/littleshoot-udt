@@ -309,10 +309,15 @@ public class UDPEndPoint {
 							session.received(packet,peer);
 						}
 					}
-				}catch(SocketException ex){
+				} catch(SocketException e) {
 					//logger.log(Level.INFO, "SocketException: "+ex.getMessage());
-				    logger.warn("Socket error", ex);
-				}catch(SocketTimeoutException e){
+				    if (e.getMessage().contains("Socket closed")) {
+				        logger.info("Receive timeout?", e);
+				    }
+				    else {
+				        logger.warn("Socket error", e);
+				    }
+				} catch (SocketTimeoutException e) {
 					//can safely ignore... we will retry until the endpoint is stopped
 				    logger.warn("Socket timeout", e);
 				}

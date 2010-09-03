@@ -109,11 +109,22 @@ public class ServerSession extends UDTSession {
 				setState(shutdown);
 				active = false;
 				logger.info("Connection shutdown initiated by the other side.");
+				
+				// We don't close the socket on this side because all there
+				// can be data left in the buffer and we don't want the
+				// server to be able to dictate when socket closes happen,
+				// since we always know on this side.
+				
+				// NOTE: Due to the way ICE messages are exchanged, the UDT
+				// "server" is actually the HTTP client and the UDT client
+				// is actually the HTTP server.
+				/*
                 try {
                     getSocket().close();
                 } catch (IOException e) {
                     logger.warn("Exception closing socket", e);
                 }
+                */
 				return;
 			}
 
