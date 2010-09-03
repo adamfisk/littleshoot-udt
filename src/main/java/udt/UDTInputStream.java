@@ -38,7 +38,6 @@ import java.util.concurrent.PriorityBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.lastbamboo.common.util.ThreadUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -206,7 +205,7 @@ public class UDTInputStream extends InputStream {
             }
             if(expectMoreData.get() || !appData.isEmpty()) {
                 log.info("Waiting for more data");
-                Thread.sleep(100 * numCalls);
+                Thread.sleep(100 * (numCalls*2));
                 return read(target, off, len, numCalls + 1);
             }
             log.info("Reached end -- no more data!!");
@@ -262,7 +261,7 @@ public class UDTInputStream extends InputStream {
             }
             if(expectMoreData.get() || !appData.isEmpty()) {
                 log.info("Waiting for more data");
-                Thread.sleep(100 * numCalls);
+                Thread.sleep(100 * (numCalls*2));
                 return read(target, numCalls + 1);
                 //log.info("Returning 0");
                 //return 0;
