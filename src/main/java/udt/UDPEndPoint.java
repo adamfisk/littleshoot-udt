@@ -52,7 +52,6 @@ import org.slf4j.LoggerFactory;
 import udt.packets.ConnectionHandshake;
 import udt.packets.Destination;
 import udt.packets.PacketFactory;
-import udt.util.MeanValue;
 import udt.util.UDTThreadFactory;
 
 /**
@@ -260,71 +259,70 @@ public class UDPEndPoint {
 	private long lastDestID=-1;
 	private UDTSession lastSession;
 	
-	MeanValue v=new MeanValue("",false);
-	
 	protected void doReceive()throws IOException{
 		while(!stopped){
 			try{
-				try{
-					//will block until a packet is received or timeout has expired
-					dgSocket.receive(dp);
-					
-					Destination peer=new Destination(dp.getAddress(), dp.getPort());
-					int l=dp.getLength();
-					UDTPacket packet=PacketFactory.createPacket(dp.getData(),l);
-					lastPacket=packet;
+				//will block until a packet is received or timeout has expired
+				dgSocket.receive(dp);
+				
+				Destination peer=new Destination(dp.getAddress(), dp.getPort());
+				int l=dp.getLength();
+				final UDTPacket packet = 
+				    PacketFactory.createPacket(dp.getData(),l);
+				lastPacket=packet;
 
-					//handle connection handshake 
-					if(packet.isConnectionHandshake()){
-						UDTSession session=clientSessions.get(peer);
-						if(session==null){
-							session=new ServerSession(dp,this);
-							addSession(session.getSocketID(),session);
-							//TODO need to check peer to avoid duplicate server session
-							if(serverSocketMode){
-								logger.debug("Pooling new request.");
-								sessionHandoff.put(session);
-								logger.debug("Request taken for processing.");
-							}
+				//handle connection handshake 
+				if(packet.isConnectionHandshake()){
+					UDTSession session=clientSessions.get(peer);
+					if(session==null){
+						session=new ServerSession(dp,this);
+						addSession(session.getSocketID(),session);
+						//TODO need to check peer to avoid duplicate server session
+						if(serverSocketMode){
+							logger.debug("Pooling new request.");
+							sessionHandoff.put(session);
+							logger.debug("Request taken for processing.");
 						}
-						peer.setSocketID(((ConnectionHandshake)packet).getSocketID());
-						session.received(packet,peer);
+					}
+					peer.setSocketID(((ConnectionHandshake)packet).getSocketID());
+					session.received(packet,peer);
+				}
+				else{
+					//dispatch to existing session
+					long dest=packet.getDestinationID();
+					UDTSession session;
+					if(dest==lastDestID){
+						session=lastSession;
 					}
 					else{
-						//dispatch to existing session
-						long dest=packet.getDestinationID();
-						UDTSession session;
-						if(dest==lastDestID){
-							session=lastSession;
-						}
-						else{
-							session=sessions.get(dest);
-							lastSession=session;
-							lastDestID=dest;
-						}
-						if(session==null){
-							logger.warn("Unknown session <"+packet.getDestinationID()+"> requested from <"+peer+"> packet type "+packet.getClass().getName());
-						}
-						else{
-							session.received(packet,peer);
-						}
+						session=sessions.get(dest);
+						lastSession=session;
+						lastDestID=dest;
 					}
-				} catch(SocketException e) {
-					//logger.log(Level.INFO, "SocketException: "+ex.getMessage());
-				    if (e.getMessage().contains("Socket closed")) {
-				        logger.info("Receive timeout?", e);
-				    }
-				    else {
-				        logger.warn("Socket error", e);
-				    }
-				} catch (SocketTimeoutException e) {
-					//can safely ignore... we will retry until the endpoint is stopped
-				    logger.warn("Socket timeout", e);
+					if(session==null){
+						logger.warn("Unknown session <"+packet.getDestinationID()+"> requested from <"+peer+"> packet type "+packet.getClass().getName());
+					}
+					else{
+						session.received(packet,peer);
+					}
 				}
-
-			}catch(Exception e){
-				logger.warn("Receive error!!", e);
-			}
+			} catch(final SocketException e) {
+				//logger.log(Level.INFO, "SocketException: "+ex.getMessage());
+			    if (e.getMessage().contains("Socket closed")) {
+			        logger.info("Receive timeout?", e);
+			    }
+			    else {
+			        logger.warn("Socket error", e);
+			    }
+			    break;
+			} catch (final SocketTimeoutException e) {
+				//can safely ignore... we will retry until the endpoint is stopped
+			    logger.warn("Socket timeout", e);
+			    break;
+			} catch (final InterruptedException e) {
+			    logger.warn("Interrupted?", e);
+			    break;
+            }
 		}
 	}
 
