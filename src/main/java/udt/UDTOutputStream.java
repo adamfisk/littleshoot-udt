@@ -34,7 +34,7 @@ package udt;
 import java.io.IOException;
 import java.io.OutputStream;
 
-import org.lastbamboo.common.util.ThreadUtils;
+import org.littleshoot.util.ThreadUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -45,7 +45,7 @@ import java.nio.ByteBuffer;
 import java.text.NumberFormat;
 
 import org.apache.commons.lang.StringUtils;
-import org.lastbamboo.common.util.IoUtils;
+import org.littleshoot.util.IoUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

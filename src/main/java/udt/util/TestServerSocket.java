@@ -52,7 +52,7 @@ import java.util.concurrent.Executors;
 import java.util.logging.Logger;
 
 import org.apache.commons.lang.StringUtils;
-import org.lastbamboo.common.util.IoUtils;
+import org.littleshoot.util.IoUtils;
 import org.slf4j.LoggerFactory;
 
 import udt.UDTReceiver;
